@@ -18,12 +18,12 @@ import poc2.student_data.entity.Student;
 import poc2.student_data.service.StudentService;
 
 @RestController
-@RequestMapping("api/v1/students")
-public class StudentController {
-
+@RequestMapping("management/")
+public class StudentManagementController {
+	
 	@Autowired
 	StudentService studentService;
-
+	
 	@PostMapping("/saveStudent")
 	public ResponseEntity<Student> saveStudent(@RequestBody @Valid Student student) {
 		Student studentSave = studentService.saveStudent(student);
@@ -42,5 +42,6 @@ public class StudentController {
 		Student student = studentService.searchById(studentId);
 		return ResponseEntity.status(HttpStatus.OK).body(student);
 	}
+	
 
 }
