@@ -7,12 +7,21 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+import poc2.student_data.jwt.JwtConfig;
+import poc2.student_data.jwt.JwtTokenVerifier;
+import poc2.student_data.jwt.JwtUsernameAndPasswordAuthenticationFilter;
+
 import static poc2.student_data.security.ApplicationUserRole.*;
+
+import javax.crypto.SecretKey;
+
 import static poc2.student_data.security.ApplicationUserPermission.*;
 
 @Configuration
@@ -20,15 +29,22 @@ import static poc2.student_data.security.ApplicationUserPermission.*;
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final PasswordEncoder passwordEncoder;
+	private final SecretKey secretKey;
+	private final JwtConfig jwtConfig;
 
-	@Autowired
-	public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
+	public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, SecretKey secretKey, JwtConfig jwtConfig) {
+		
 		this.passwordEncoder = passwordEncoder;
+		this.secretKey = secretKey;
+		this.jwtConfig = jwtConfig;
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests().antMatchers("/", "index", "/css/*", "/js/*").permitAll()
+		http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+				.addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUsernameAndPasswordAuthenticationFilter.class)
+				.authorizeRequests().antMatchers("/", "index", "/css/*", "/js/*").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/**").hasAuthority(STUDENT_READ.getPermission())
 				.antMatchers(HttpMethod.POST, "/api/**")
 				.hasAnyAuthority(STUDENT_READ.getPermission(), STUDENT_WRITE.getPermission()).anyRequest()
