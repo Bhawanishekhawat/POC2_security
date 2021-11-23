@@ -18,7 +18,7 @@ import poc2.student_data.entity.Student;
 import poc2.student_data.service.StudentService;
 
 @RestController
-@RequestMapping("api/v1/students")
+@RequestMapping("api/students")
 public class StudentController {
 
 	@Autowired
