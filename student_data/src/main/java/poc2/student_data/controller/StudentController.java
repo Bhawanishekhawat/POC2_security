@@ -11,16 +11,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import poc2.student_data.entity.Student;
 import poc2.student_data.service.StudentService;
 
 @RestController
+@RequestMapping("api/students")
 public class StudentController {
 
 	@Autowired
-	StudentService studentService;
+	private StudentService studentService;
 
 	@PostMapping("/saveStudent")
 	public ResponseEntity<Student> saveStudent(@RequestBody @Valid Student student) {
@@ -35,10 +37,10 @@ public class StudentController {
 
 	}
 
-	@GetMapping("/getbyId/{studentId}")
-	public ResponseEntity<Student> findById(@PathVariable Long studentId){
+	@GetMapping("/getById/{studentId}")
+	public ResponseEntity<Student> findById(@PathVariable Long studentId) {
 		Student student = studentService.searchById(studentId);
 		return ResponseEntity.status(HttpStatus.OK).body(student);
 	}
-	
+
 }
