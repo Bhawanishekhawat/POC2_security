@@ -22,7 +22,7 @@ import poc2.student_data.service.StudentService;
 public class StudentController {
 
 	@Autowired
-	StudentService studentService;
+	private StudentService studentService;
 
 	@PostMapping("/saveStudent")
 	public ResponseEntity<Student> saveStudent(@RequestBody @Valid Student student) {
